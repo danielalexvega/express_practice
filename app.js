@@ -5,6 +5,8 @@ const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
 const HttpError = require("./models/http-error");
 
+require('dotenv').config();
+
 const app = express();
 
 app.use(bodyParser.json());
