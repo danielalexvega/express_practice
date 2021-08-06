@@ -3,6 +3,8 @@ const getCoordsForAddress = require("../util/location");
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 
+const Place = require("../models/place");
+
 let DUMMY_PLACES = [
   {
     id: "p1",
@@ -48,7 +50,9 @@ const getPlacesByUserId = (req, res, next) => {
 const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return next(new HttpError("Invalid inputs passed, please check your data", 422));
+    return next(
+      new HttpError("Invalid inputs passed, please check your data", 422)
+    );
   }
 
   const { title, description, address, creator } = req.body;
@@ -57,19 +61,27 @@ const createPlace = async (req, res, next) => {
   try {
     coordinates = await getCoordsForAddress(address);
   } catch (error) {
-      return next(error);
+    return next(error);
   }
 
-  const createdPlace = {
-    id: uuidv4(),
-    title,
+  const createdPlace = new Place({
+    title, 
     description,
-    location: coordinates,
     address,
-    creator,
-  };
+    location: coordinates,
+    image: 'https://marvel-b1-cdn.bc0a.com/f00000000179470/www.esbnyc.com/sites/default/files/styles/small_feature/public/2020-02/Green%20lights.jpg?itok=eesKOaKH',
+    creator
+  });
 
-  DUMMY_PLACES.push(createdPlace);
+  try {
+    await createdPlace.save();
+  } catch(err) {
+    const error = new HttpError(
+      'Creating place failed. Please try again',
+      500
+    );
+    return next(error);
+  }
 
   res.status(201).json({ place: createdPlace });
 };
