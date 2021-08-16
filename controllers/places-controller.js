@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const getCoordsForAddress = require("../util/location");
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
+const fs = require("fs");
 
 const Place = require("../models/place");
 const User = require("../models/user");
@@ -57,7 +58,9 @@ const getPlacesByUserId = async (req, res, next) => {
   }
 
   res.json({
-    places: userWithPlaces.places.map((place) => place.toObject({ getters: true })),
+    places: userWithPlaces.places.map((place) =>
+      place.toObject({ getters: true })
+    ),
   });
 };
 
@@ -83,8 +86,7 @@ const createPlace = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image:
-      "https://marvel-b1-cdn.bc0a.com/f00000000179470/www.esbnyc.com/sites/default/files/styles/small_feature/public/2020-02/Green%20lights.jpg?itok=eesKOaKH",
+    image: req.file.path,
     creator,
   });
 
@@ -176,6 +178,8 @@ const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
+  const imagePath = place.image;
+
   try {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -190,6 +194,10 @@ const deletePlace = async (req, res, next) => {
     );
     return next(error);
   }
+
+  fs.unlink(imagePath, err => {
+    console.log(err);
+  });
 
   res.status(200).json({ message: "Deleted place." });
 };
