@@ -1,9 +1,0 @@
-{
-    "env": {
-        "DB_USER": "mern-daniel",
-        "DB_PASSWORD": "2T4jR92YdZwgsrYF",
-        "DB_NAME": "mern",
-        "GOOGLE_API_KEY": "AIzaSyBPnQLcL_9sg6k43O-C62MUoR0P-Iffxz4",
-        "JWT_KEY": "back_to_back_houston_center"
-    }
-}
